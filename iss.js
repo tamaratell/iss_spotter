@@ -85,9 +85,91 @@ const fetchISSFlyOverTimes = (coordinates, callback) => {
 
     const data = JSON.parse(body);
     const { risetime, duration } = data.response[0];
-    const flyOverTimes = { risetime, duration };
-    callback(null, flyOverTimes);
+    const passTimes = { risetime, duration };
+    callback(null, passTimes);
 
+  });
+};
+
+// iss.js 
+
+/**
+ * Orchestrates multiple API requests in order to determine the next 5 upcoming ISS fly overs for the user's current location.
+ * Input:
+ *   - A callback with an error or results. 
+ * Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The fly-over times as an array (null if error):
+ *     [ { risetime: <number>, duration: <number> }, ... ]
+ */
+
+
+// const nextISSTimesForMyLocation = ((error, passTimes) => {
+
+// });
+
+const printPassTimes = (passTimes) => {
+  for (const pass of passTimes) {
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(pass.risetime);
+    const duration = pass.duration;
+    console.log(`Next pass at ${datetime} for ${duration} seconds!`);
+  }
+};
+
+
+// const nextISSTimesForMyLocation = (callback) => {
+//   fetchMyIP((error, ip) => {
+//     if (error) {
+//       return callback(error, null);
+//     }
+
+//     fetchCoordsByIP(ip, (error, coords) => {
+//       if (error) {
+//         return callback(error, null);
+//       }
+
+//       fetchISSFlyOverTimes(coords, (error, passes) => {
+//         if (error) {
+//           return callback(error, null);
+//         }
+
+//         // success, print out the deets!
+//         const printPassTimes = function(passTimes) {
+//           for (const pass of passTimes) {
+//             const datetime = new Date(0);
+//             datetime.setUTCSeconds(pass.risetime);
+//             const duration = pass.duration;
+//             console.log(`Next pass at ${datetime} for ${duration} seconds!`);
+//           }
+//         };
+
+//         printPassTimes(passes);
+//         callback(null, passes);
+//       });
+//     });
+//   });
+// };
+
+const nextISSTimesForMyLocation = function(callback) {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return callback(error, null);
+    }
+
+    fetchCoordsByIP(ip, (error, loc) => {
+      if (error) {
+        return callback(error, null);
+      }
+
+      fetchISSFlyOverTimes(loc, (error, nextPasses) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        callback(null, nextPasses);
+      });
+    });
   });
 };
 
@@ -99,12 +181,13 @@ const callback = (error, data) => {
   console.log("It worked! Returned IP:", data);
 };
 
+nextISSTimesForMyLocation(callback);
+
+
+
+
 //coordinates = { latitude: 43.653226, longitude: -79.3831843 };
 //fetchISSFlyOverTimes({ latitude: '43.653226', longitude: '-79.3831843' }, callback);
 
 
-module.exports = {
-  fetchMyIP,
-  fetchCoordsByIP,
-  fetchISSFlyOverTimes
-};
+module.exports = { nextISSTimesForMyLocation };
