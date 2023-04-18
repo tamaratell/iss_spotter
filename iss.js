@@ -30,6 +30,8 @@ const fetchMyIP = (callback) => {
   });
 };
 
+module.exports = fetchMyIP;
+
 const fetchCoordsByIP = (ip, callback) => {
   request(`http://ipwho.is/${ip}`, (error, response, body) => {
     if (error) {
@@ -190,4 +192,4 @@ nextISSTimesForMyLocation(callback);
 //fetchISSFlyOverTimes({ latitude: '43.653226', longitude: '-79.3831843' }, callback);
 
 
-module.exports = { nextISSTimesForMyLocation };
+module.exports = { nextISSTimesForMyLocation, printPassTimes };
